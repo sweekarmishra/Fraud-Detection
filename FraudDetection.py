@@ -4,9 +4,10 @@
 # In[1]:
 
 
-import pandas as pd 
-df=pd.read_csv("creditcard.csv")
-df.head()
+import pandas as pd  
+
+csv_url = "https://your-csv-file-link.com/data.csv"  
+df = pd.read_csv(csv_url)
 
 
 # In[2]:
