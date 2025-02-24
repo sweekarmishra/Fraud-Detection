@@ -1,34 +1,38 @@
-from flask import Flask, request, jsonify
-import joblib
+from flask import Flask, request, jsonify, render_template
+import pickle
 import numpy as np
-import os
 
-app = Flask(__name__)  # Fixed __name_
+# Initialize Flask app
+app = Flask(__name__)
 
-# Path to the trained model
-MODEL_PATH = "fraud_detection_model.pkl"
+# Load the fraud detection model
+model_path = "fraud_detection_model.pkl"  # Ensure this file exists
+with open(model_path, "rb") as model_file:
+    model = pickle.load(model_file)
 
-# Load the trained model if it exists
-if os.path.exists(MODEL_PATH):
-    model = joblib.load(MODEL_PATH)
-    print("✅ Model loaded successfully!")
-else:
-    model = None
-    print("❌ Error: Model file not found!")
+# Home route
+@app.route("/")
+def home():
+    return render_template("index.html")  # Ensure "templates/index.html" exists
 
+# Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
-    if model is None:
-        return jsonify({"error": "Model not found. Please upload fraud_detection_model.pkl."})
-
     try:
-        data = request.json  # Expecting JSON input
-        features = np.array(data["features"]).reshape(1, -1)  # Convert input to NumPy array
-        prediction = model.predict(features)  # Make prediction
-        return jsonify({"fraud": bool(prediction[0])})  # Return prediction as JSON
+        # Get JSON data from request
+        data = request.get_json()
+        
+        # Convert data to NumPy array
+        features = np.array(data["features"]).reshape(1, -1)
+        
+        # Make prediction
+        prediction = model.predict(features)
+
+        return jsonify({"prediction": int(prediction[0])})  # Return prediction
 
     except Exception as e:
-        return jsonify({"error": str(e)})  # Handle errors
+        return jsonify({"error": str(e)}), 400  # Handle errors
 
+# Run the Flask app
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
