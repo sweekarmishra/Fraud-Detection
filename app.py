@@ -3,7 +3,7 @@ import joblib
 import numpy as np
 import os
 
-app = Flask(_name)  # Fixed __name_
+app = Flask(__name__)  # Fixed __name_
 
 # Path to the trained model
 MODEL_PATH = "fraud_detection_model.pkl"
