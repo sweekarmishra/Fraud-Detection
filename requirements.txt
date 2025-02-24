@@ -1,0 +1,6 @@
+requirements
+flask
+numpy
+joblib
+scikit-learn
+gunicorn
